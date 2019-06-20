@@ -1,7 +1,7 @@
 import string
 import pandas as pd
 import numpy as np
-from sympy import symbols
+from sympy import symbols, sympify
 import itertools
 
 # # define the generator itself
@@ -23,18 +23,21 @@ def make_mapping(table, edge=(1, 1)):
     '''
     # better with generators..
     sz = table.shape
-    idx = np.arange(edge[0],edge[0]+sz[0]).astype(str)
+    idx = np.arange(edge[0] + 1, edge[0] + sz[0]).astype(str)
     tdx = list(string.ascii_uppercase[edge[1]:edge[1]+sz[1]])
-    return pd.DataFrame([[ symbols(x + y)  for x in tdx] for y in idx], columns=table.columns)
+    return pd.DataFrame([[ x + y  for x in tdx] for y in idx], columns=table.columns)
 
-def clc(x):
+def clc(expression):
     '''
-    Creates a symbolic formula
+    Parses the input string expression into an excel formula with correct cell references
     '''
-    return x.apply(lambda x: '='+str(x))
+    return eval(("'" + expression + "'").replace('{',  "'+m['").replace('}', "']+'"))
 
 
 if __name__=='__main__':
-    table = pd.DataFrame({'price':[3,4,5,6], 'stu':[1,2,2,3]})
-    m = make_mapping(table, edge=(10,10))
-    table['test'] = clc((m['price']+m['stu'])/m['stu'])
+    tabl = pd.DataFrame({'price':np.arange(1, 500), 'stu':np.arange(1, 500)})
+    m = make_mapping(tabl, edge=(0, 0))
+
+    
+    tabl['test'] = clc(' =BDP({price},{stu})^3 ') # set an excel formula for a full column
+    print(tabl)
