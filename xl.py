@@ -17,7 +17,7 @@ import itertools
 #         return s
 
 
-def make_mapping(table, edge=(1,1)):
+def make_mapping(table, edge=(1, 1)):
     '''
     Constructs a mapping matrix with symbolic excel fields
     '''
